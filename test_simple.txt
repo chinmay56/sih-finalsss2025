@@ -1,0 +1,3 @@
+This is a simple test file.
+Testing text extraction from TXT file.
+यो नेपाली पाठ हो।

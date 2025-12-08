@@ -1,0 +1,207 @@
+.module-features {
+  margin-top: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.module-features span {
+  font-size: 0.8rem;
+  color: var(--text-accent);
+  background: var(--bg-secondary);
+  padding: 4px 8px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  text-align: center;
+}
+
+.manuscript-description {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-top: 8px;
+  line-height: 1.4;
+  font-style: italic;
+}
+
+.learning-petal:hover {
+  transform: translateY(-5px) scale(1.02);
+  box-shadow: 0 10px 25px var(--shadow);
+  border-color: var(--accent);
+}
+
+.manuscript-scroll:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px var(--shadow);
+  border-color: var(--accent);
+}
+
+.learning-petal:active,
+.manuscript-scroll:active {
+  transform: scale(0.98);
+  transition: transform 0.1s ease;
+}
+
+.lesson-content {
+  margin-top: 30px;
+  padding: 25px;
+  background: var(--bg-secondary);
+  border-radius: 15px;
+  border: 2px solid var(--border);
+}
+
+.alphabet-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 15px;
+  margin: 20px 0;
+}
+
+.char-card {
+  background: var(--bg-accent);
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  padding: 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.char-card:hover {
+  transform: scale(1.1);
+  border-color: var(--accent);
+}
+
+.char {
+  font-size: 2rem;
+  display: block;
+  margin-bottom: 5px;
+}
+
+.audio-btn {
+  font-size: 0.8rem;
+}
+
+.vocab-card {
+  text-align: center;
+  padding: 30px;
+}
+
+.word-display {
+  margin: 20px 0;
+  padding: 20px;
+  background: var(--bg-accent);
+  border-radius: 10px;
+}
+
+.nepali-word {
+  font-size: 2.5rem;
+  display: block;
+  margin-bottom: 10px;
+  color: var(--text-primary);
+}
+
+.english-word {
+  font-size: 1.5rem;
+  color: var(--text-secondary);
+  display: block;
+  margin-bottom: 15px;
+}
+
+.next-btn {
+  background: var(--accent);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 20px;
+  cursor: pointer;
+}
+
+.grammar-example {
+  background: var(--bg-accent);
+  padding: 20px;
+  border-radius: 10px;
+  margin: 15px 0;
+}
+
+.story-text {
+  background: var(--bg-accent);
+  padding: 20px;
+  border-radius: 10px;
+  line-height: 1.6;
+}
+
+.manuscript-reader {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80%;
+  max-width: 600px;
+  background: var(--bg-secondary);
+  border: 3px solid var(--border);
+  border-radius: 20px;
+  box-shadow: 0 20px 40px var(--shadow);
+  z-index: 1000;
+}
+
+.reader-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 2px solid var(--border);
+}
+
+.close-btn {
+  background: var(--sacred-red);
+  color: white;
+  border: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 1.2rem;
+}
+
+.reader-content {
+  padding: 25px;
+}
+
+.text-display {
+  margin-bottom: 20px;
+}
+
+.original-text {
+  background: var(--bg-accent);
+  padding: 15px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.translation-text {
+  background: var(--bg-primary);
+  padding: 15px;
+  border-radius: 10px;
+  font-style: italic;
+  color: var(--text-secondary);
+}
+
+.reader-controls {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+}
+
+.reader-controls button {
+  padding: 8px 16px;
+  border-radius: 15px;
+}
+
+.page-info {
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}

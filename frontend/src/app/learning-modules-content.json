@@ -1,0 +1,409 @@
+{
+  "alphabets_and_scripts": {
+    "devanagari": {
+      "vowels": [
+        {
+          "character": "अ",
+          "transliteration": "a",
+          "type": "short_vowel",
+          "recognition": "Single vertical line with horizontal top - like number '7' rotated",
+          "stroke_order": ["Draw vertical line top to bottom", "Add horizontal line at top left to right"],
+          "audio_guide": "Open mouth, neutral tongue, short 'uh' sound",
+          "example_words": [
+            {"word": "अम्मा", "meaning": "mother", "sentence": "अम्मा घरमा छिन्।", "translation": "Mother is at home."}
+          ],
+          "common_mistakes": ["Making horizontal line too long", "Missing slight curve at bottom"],
+          "practice_tip": "Start with vertical stroke, then add horizontal cap"
+        },
+        {
+          "character": "आ",
+          "transliteration": "aa",
+          "type": "long_vowel",
+          "recognition": "Like अ but with curved line extending right",
+          "stroke_order": ["Draw vertical line", "Add curved extension to the right"],
+          "audio_guide": "Open mouth wide, tongue low, long 'ah' sound",
+          "example_words": [
+            {"word": "आमा", "meaning": "mother", "sentence": "आमा खाना पकाउँछिन्।", "translation": "Mother cooks food."}
+          ],
+          "common_mistakes": ["Curve too small", "Not connecting properly"],
+          "practice_tip": "Make smooth rightward curve from middle of vertical line"
+        },
+        {
+          "character": "इ",
+          "transliteration": "i",
+          "type": "short_vowel",
+          "recognition": "Curved line from top left, then vertical",
+          "stroke_order": ["Draw curved line from top-left", "Add vertical line"],
+          "audio_guide": "Lips slightly spread, tongue high, short 'i' sound",
+          "example_words": [
+            {"word": "इनार", "meaning": "well", "sentence": "इनारमा पानी छ।", "translation": "There is water in the well."}
+          ],
+          "common_mistakes": ["Making curve too round", "Vertical line not straight"],
+          "practice_tip": "Gentle curve first, then straight vertical"
+        },
+        {
+          "character": "ई",
+          "transliteration": "ii",
+          "type": "long_vowel",
+          "recognition": "Like इ but with longer curve",
+          "stroke_order": ["Draw extended curved line", "Add vertical line"],
+          "audio_guide": "Lips spread wider, tongue high, long 'ee' sound",
+          "example_words": [
+            {"word": "ईश्वर", "meaning": "god", "sentence": "ईश्वरमा विश्वास गर्छु।", "translation": "I believe in God."}
+          ],
+          "common_mistakes": ["Curve not long enough", "Inconsistent shape"],
+          "practice_tip": "Extend the curve more than इ"
+        },
+        {
+          "character": "उ",
+          "transliteration": "u",
+          "type": "short_vowel",
+          "recognition": "Horizontal top with curved bottom",
+          "stroke_order": ["Draw horizontal line", "Add bottom curve"],
+          "audio_guide": "Lips rounded, tongue back, short 'u' sound",
+          "example_words": [
+            {"word": "उल्लू", "meaning": "owl", "sentence": "उल्लू रातमा उड्छ।", "translation": "The owl flies at night."}
+          ],
+          "common_mistakes": ["Bottom curve too deep", "Uneven horizontal"],
+          "practice_tip": "Keep horizontal straight, gentle bottom curve"
+        }
+      ],
+      "consonants": [
+        {
+          "character": "क",
+          "transliteration": "ka",
+          "type": "velar",
+          "recognition": "Vertical line with horizontal and curve",
+          "stroke_order": ["Draw vertical line", "Add horizontal at top", "Draw connecting curve"],
+          "audio_guide": "Back of tongue touches soft palate, 'k' sound",
+          "example_words": [
+            {"word": "कलम", "meaning": "pen", "sentence": "कलमले लेख्छु।", "translation": "I write with a pen."}
+          ],
+          "common_mistakes": ["Curve too small", "Lines not perpendicular"],
+          "practice_tip": "Strong vertical and horizontal, smooth curve"
+        },
+        {
+          "character": "ख",
+          "transliteration": "kha",
+          "type": "velar_aspirated",
+          "recognition": "Like क but with additional strokes",
+          "stroke_order": ["Draw क base", "Add aspiration marks"],
+          "audio_guide": "Like क but with puff of air",
+          "example_words": [
+            {"word": "खुसी", "meaning": "happiness", "sentence": "म खुसी छु।", "translation": "I am happy."}
+          ],
+          "common_mistakes": ["Missing aspiration", "Poor spacing"],
+          "practice_tip": "Master क first, then add aspiration marks"
+        }
+      ]
+    },
+    "sinhala": {
+      "vowels": [
+        {
+          "character": "අ",
+          "transliteration": "a",
+          "type": "short_vowel",
+          "recognition": "Circular shape with opening at top-right",
+          "stroke_order": ["Draw circle clockwise", "Leave top-right open"],
+          "audio_guide": "Open mouth, neutral tongue, short 'a' sound",
+          "example_words": [
+            {"word": "අම්මා", "meaning": "mother", "sentence": "අම්මා ගෙදර ඉන්නවා.", "translation": "Mother is at home."}
+          ],
+          "common_mistakes": ["Perfect circle", "Opening too wide"],
+          "practice_tip": "Slightly oval, proper opening"
+        },
+        {
+          "character": "ආ",
+          "transliteration": "aa",
+          "type": "long_vowel",
+          "recognition": "Like අ with additional stroke",
+          "stroke_order": ["Draw අ base", "Add right extension"],
+          "audio_guide": "Open mouth wider, long 'aa' sound",
+          "example_words": [
+            {"word": "ආයුබෝවන්", "meaning": "hello", "sentence": "ආයුබෝවන් මිත්‍රයා!", "translation": "Hello friend!"}
+          ],
+          "common_mistakes": ["Extension not connected", "Base distorted"],
+          "practice_tip": "Smooth extension from base circle"
+        }
+      ]
+    },
+    "learning_progression": [
+      "Start with simple vowels (अ, आ, इ)",
+      "Practice stroke order repeatedly",
+      "Learn similar characters together",
+      "Use audio for pronunciation",
+      "Practice writing words, not just characters"
+    ]
+  },
+  "vocabulary_builder": {
+    "categories": {
+      "family": [
+        {"nepali": "आमा", "english": "mother", "sentence": "आमा खाना पकाउँछिन्।", "translation": "Mother cooks food.", "audio_note": "Stress on first syllable"},
+        {"nepali": "बुबा", "english": "father", "sentence": "बुबा काममा जानुहुन्छ।", "translation": "Father goes to work.", "audio_note": "Equal stress on both syllables"},
+        {"nepali": "दाजु", "english": "elder brother", "sentence": "दाजु पढ्दै हुनुहुन्छ।", "translation": "Elder brother is studying.", "audio_note": "Long 'aa' sound"},
+        {"nepali": "दिदी", "english": "elder sister", "sentence": "दिदी गीत गाउँछिन्।", "translation": "Elder sister sings songs.", "audio_note": "Short 'i' sounds"},
+        {"nepali": "भाइ", "english": "younger brother", "sentence": "भाइ खेल्दै छ।", "translation": "Younger brother is playing.", "audio_note": "Diphthong 'ai'"}
+      ],
+      "food": [
+        {"nepali": "भात", "english": "rice", "sentence": "भात खान्छु।", "translation": "I eat rice.", "audio_note": "Aspirated 'bh' sound"},
+        {"nepali": "दाल", "english": "lentils", "sentence": "दाल मिठो छ।", "translation": "The lentils are tasty.", "audio_note": "Long 'aa' sound"},
+        {"nepali": "तरकारी", "english": "vegetables", "sentence": "तरकारी स्वस्थ हुन्छ।", "translation": "Vegetables are healthy.", "audio_note": "Rolling 'r' sounds"},
+        {"nepali": "मासु", "english": "meat", "sentence": "मासु पकाउँछु।", "translation": "I cook meat.", "audio_note": "Soft 's' sound"},
+        {"nepali": "फलफूल", "english": "fruits", "sentence": "फलफूल खानुपर्छ।", "translation": "One should eat fruits.", "audio_note": "Compound word"}
+      ],
+      "emotions": [
+        {"nepali": "खुसी", "english": "happy", "sentence": "म खुसी छु।", "translation": "I am happy.", "audio_note": "Aspirated 'kh'"},
+        {"nepali": "दुःखी", "english": "sad", "sentence": "ऊ दुःखी देखिन्छ।", "translation": "He/she looks sad.", "audio_note": "Visarga sound"},
+        {"nepali": "रिसाएको", "english": "angry", "sentence": "बुबा रिसाएको छ।", "translation": "Father is angry.", "audio_note": "Past participle form"},
+        {"nepali": "डराएको", "english": "scared", "sentence": "बच्चा डराएको छ।", "translation": "The child is scared.", "audio_note": "Retroflex 'D'"},
+        {"nepali": "आश्चर्य", "english": "surprise", "sentence": "यो आश्चर्यको कुरा हो।", "translation": "This is surprising.", "audio_note": "Conjunct consonant"}
+      ],
+      "nature": [
+        {"nepali": "पहाड", "english": "mountain", "sentence": "पहाड अग्लो छ।", "translation": "The mountain is tall.", "audio_note": "Aspirated 'ph'"},
+        {"nepali": "नदी", "english": "river", "sentence": "नदी बग्छ।", "translation": "The river flows.", "audio_note": "Long 'ii' ending"},
+        {"nepali": "जंगल", "english": "forest", "sentence": "जंगलमा जनावर छन्।", "translation": "There are animals in the forest.", "audio_note": "Nasal 'n' sound"},
+        {"nepali": "आकाश", "english": "sky", "sentence": "आकाश नीलो छ।", "translation": "The sky is blue.", "audio_note": "Long vowels"},
+        {"nepali": "तारा", "english": "star", "sentence": "तारा चम्किन्छ।", "translation": "Stars shine.", "audio_note": "Rolling 'r'"}
+      ],
+      "verbs": [
+        {"nepali": "जानु", "english": "to go", "sentence": "म स्कूल जान्छु।", "translation": "I go to school.", "audio_note": "Infinitive form"},
+        {"nepali": "आउनु", "english": "to come", "sentence": "ऊ घर आउँछ।", "translation": "He/she comes home.", "audio_note": "Diphthong 'au'"},
+        {"nepali": "खानु", "english": "to eat", "sentence": "हामी खाना खान्छौं।", "translation": "We eat food.", "audio_note": "Aspirated 'kh'"},
+        {"nepali": "पिउनु", "english": "to drink", "sentence": "पानी पिउनुपर्छ।", "translation": "One must drink water.", "audio_note": "Compound verb"},
+        {"nepali": "सुत्नु", "english": "to sleep", "sentence": "राति सुत्छु।", "translation": "I sleep at night.", "audio_note": "Conjunct 'tn'"}
+      ],
+      "daily_use": [
+        {"nepali": "पानी", "english": "water", "sentence": "पानी पिउँछु।", "translation": "I drink water.", "audio_note": "Nasal ending"},
+        {"nepali": "घर", "english": "house", "sentence": "घर सफा छ।", "translation": "The house is clean.", "audio_note": "Aspirated 'gh'"},
+        {"nepali": "काम", "english": "work", "sentence": "काम गर्छु।", "translation": "I work.", "audio_note": "Nasal 'm'"},
+        {"nepali": "पैसा", "english": "money", "sentence": "पैसा चाहिन्छ।", "translation": "Money is needed.", "audio_note": "Diphthong 'ai'"},
+        {"nepali": "समय", "english": "time", "sentence": "समय छैन।", "translation": "There is no time.", "audio_note": "Conjunct 'my'"}
+      ],
+      "culture": [
+        {"nepali": "नमस्ते", "english": "hello/goodbye", "sentence": "नमस्ते साथी।", "translation": "Hello friend.", "audio_note": "Cultural greeting"},
+        {"nepali": "धन्यवाद", "english": "thank you", "sentence": "धन्यवाद दाजु।", "translation": "Thank you brother.", "audio_note": "Formal gratitude"},
+        {"nepali": "दशैं", "english": "Dashain festival", "sentence": "दशैंमा घर जान्छु।", "translation": "I go home during Dashain.", "audio_note": "Major festival"},
+        {"nepali": "तिहार", "english": "Tihar festival", "sentence": "तिहारमा दीप बाल्छौं।", "translation": "We light lamps during Tihar.", "audio_note": "Festival of lights"},
+        {"nepali": "गुरु", "english": "teacher/master", "sentence": "गुरुलाई सम्मान गर्छु।", "translation": "I respect the teacher.", "audio_note": "Respectful term"}
+      ]
+    },
+    "quiz_types": {
+      "multiple_choice": {
+        "instructions": "Choose the correct English meaning",
+        "sample": {
+          "question": "आमा means:",
+          "options": ["father", "mother", "sister", "brother"],
+          "correct": 1
+        }
+      },
+      "fill_blank": {
+        "instructions": "Complete the sentence with correct Nepali word",
+        "sample": {
+          "sentence": "म _____ खान्छु। (I eat rice)",
+          "answer": "भात"
+        }
+      },
+      "match_pairs": {
+        "instructions": "Match Nepali words with English meanings",
+        "sample": [
+          {"nepali": "पानी", "english": "water"},
+          {"nepali": "घर", "english": "house"}
+        ]
+      }
+    },
+    "spaced_repetition": {
+      "day_1": ["आमा", "बुबा", "पानी", "घर", "खुसी"],
+      "day_3": ["Review day 1 + दाजु", "दिदी", "भात", "काम"],
+      "day_7": ["Review previous + नमस्ते", "धन्यवाद", "जानु"],
+      "day_14": ["Full review + new cultural terms"],
+      "day_30": ["Comprehensive review + advanced vocabulary"]
+    }
+  },
+  "grammar_rules": {
+    "sentence_structure": {
+      "basic_pattern": "Subject + Object + Verb (SOV)",
+      "examples": [
+        {
+          "nepali": "म भात खान्छु।",
+          "breakdown": "म (I) + भात (rice) + खान्छु (eat)",
+          "english": "I eat rice.",
+          "pattern": "S + O + V"
+        },
+        {
+          "nepali": "ऊ किताब पढ्छ।",
+          "breakdown": "ऊ (he/she) + किताब (book) + पढ्छ (reads)",
+          "english": "He/she reads a book.",
+          "pattern": "S + O + V"
+        }
+      ]
+    },
+    "verb_conjugations": {
+      "present_tense": {
+        "pattern": "Root + छु/छ/छौं/छन्",
+        "examples": [
+          {"person": "म (I)", "verb": "खान्छु", "meaning": "I eat"},
+          {"person": "तिमी (you)", "verb": "खान्छौ", "meaning": "you eat"},
+          {"person": "ऊ (he/she)", "verb": "खान्छ", "meaning": "he/she eats"},
+          {"person": "हामी (we)", "verb": "खान्छौं", "meaning": "we eat"}
+        ]
+      },
+      "past_tense": {
+        "pattern": "Root + एँ/यौं/यो/ए",
+        "examples": [
+          {"person": "म (I)", "verb": "खाएँ", "meaning": "I ate"},
+          {"person": "तिमी (you)", "verb": "खायौ", "meaning": "you ate"},
+          {"person": "ऊ (he/she)", "verb": "खायो", "meaning": "he/she ate"}
+        ]
+      }
+    },
+    "postpositions": {
+      "explanation": "Nepali uses postpositions (after nouns) instead of prepositions",
+      "common_postpositions": [
+        {"nepali": "मा", "english": "in/at", "example": "घरमा (in the house)"},
+        {"nepali": "बाट", "english": "from", "example": "स्कूलबाट (from school)"},
+        {"nepali": "सँग", "english": "with", "example": "साथीसँग (with friend)"},
+        {"nepali": "को", "english": "of/possessive", "example": "मेरो (mine)"},
+        {"nepali": "लाई", "english": "to/for", "example": "बुबालाई (to father)"}
+      ]
+    },
+    "honorific_forms": {
+      "explanation": "Nepali has different levels of respect in speech",
+      "levels": [
+        {
+          "level": "तपाईं (formal you)",
+          "usage": "For elders, strangers, formal situations",
+          "verb_ending": "हुनुहुन्छ",
+          "example": "तपाईं कहाँ जानुहुन्छ? (Where are you going?)"
+        },
+        {
+          "level": "तिमी (informal you)",
+          "usage": "For friends, younger people",
+          "verb_ending": "छौ",
+          "example": "तिमी कहाँ जान्छौ? (Where are you going?)"
+        }
+      ]
+    },
+    "common_mistakes": [
+      {
+        "mistake": "Using English word order (SVO)",
+        "correction": "Always use SOV pattern in Nepali",
+        "wrong": "म खान्छु भात",
+        "right": "म भात खान्छु"
+      },
+      {
+        "mistake": "Forgetting honorific forms",
+        "correction": "Use appropriate respect levels",
+        "tip": "When in doubt, use formal forms"
+      },
+      {
+        "mistake": "Incorrect postposition usage",
+        "correction": "Postpositions come after nouns",
+        "example": "घरमा (in house) not मा घर"
+      }
+    ],
+    "practice_exercises": [
+      {
+        "type": "sentence_building",
+        "instruction": "Arrange words in correct SOV order",
+        "words": ["म", "पानी", "पिउँछु"],
+        "answer": "म पानी पिउँछु।"
+      },
+      {
+        "type": "verb_conjugation",
+        "instruction": "Conjugate 'जानु' (to go) for different persons",
+        "base": "जानु",
+        "answers": ["जान्छु", "जान्छौ", "जान्छ", "जान्छौं"]
+      }
+    ]
+  },
+  "stories_and_poems": {
+    "folk_tales": [
+      {
+        "title": "चतुर स्याल",
+        "title_english": "The Clever Fox",
+        "story_nepali": "एक पटक एउटा चतुर स्याल थियो। ऊ जंगलमा बस्थ्यो। एक दिन ऊ धेरै भोकाएको थियो। ऊले एउटा कुखुरा देख्यो। स्यालले भन्यो, 'तिमी कति सुन्दर छौ!' कुखुराले गीत गाउन थाल्यो। जब कुखुराले मुख खोल्यो, स्यालले उसलाई समात्यो।",
+        "story_english": "Once there was a clever fox. He lived in the forest. One day he was very hungry. He saw a chicken. The fox said, 'How beautiful you are!' The chicken started singing. When the chicken opened its mouth, the fox caught it.",
+        "moral_nepali": "चापलुसीमा नपर्नुहोस्।",
+        "moral_english": "Don't fall for flattery.",
+        "vocabulary": [
+          {"word": "चतुर", "meaning": "clever"},
+          {"word": "स्याल", "meaning": "fox"},
+          {"word": "जंगल", "meaning": "forest"},
+          {"word": "भोकाएको", "meaning": "hungry"},
+          {"word": "कुखुरा", "meaning": "chicken"}
+        ],
+        "cultural_notes": "This story teaches about being cautious of false praise, a common theme in Nepali folk wisdom.",
+        "comprehension_questions": [
+          "स्याल कहाँ बस्थ्यो? (Where did the fox live?)",
+          "स्यालले कुखुरालाई के भन्यो? (What did the fox say to the chicken?)",
+          "यस कथाको शिक्षा के हो? (What is the moral of this story?)"
+        ]
+      },
+      {
+        "title": "ईमानदार किसान",
+        "title_english": "The Honest Farmer",
+        "story_nepali": "एक गाउँमा एक ईमानदार किसान बस्थ्यो। ऊ धेरै गरिब थियो तर इमानदार थियो। एक दिन उसले खेतमा सुनको भाँडो भेट्यो। ऊले सोच्यो यो कसैको हुन सक्छ। उसले गाउँमा घोषणा गर्यो। साँचो मालिकले आएर भाँडो लिएर गयो र किसानलाई इनाम दियो।",
+        "story_english": "In a village lived an honest farmer. He was very poor but honest. One day he found a golden pot in his field. He thought it might belong to someone. He announced in the village. The real owner came, took the pot and rewarded the farmer.",
+        "moral_nepali": "इमानदारीको फल मिठो हुन्छ।",
+        "moral_english": "Honesty bears sweet fruit.",
+        "vocabulary": [
+          {"word": "ईमानदार", "meaning": "honest"},
+          {"word": "किसान", "meaning": "farmer"},
+          {"word": "गरिब", "meaning": "poor"},
+          {"word": "सुनको", "meaning": "golden"},
+          {"word": "इनाम", "meaning": "reward"}
+        ],
+        "cultural_notes": "Reflects the value placed on honesty in Nepali society, where moral character is highly respected.",
+        "comprehension_questions": [
+          "किसान कस्तो मान्छे थियो? (What kind of person was the farmer?)",
+          "उसले के भेट्यो? (What did he find?)",
+          "उसले किन घोषणा गर्यो? (Why did he make an announcement?)"
+        ]
+      }
+    ],
+    "poems": [
+      {
+        "title": "मेरो देश",
+        "title_english": "My Country",
+        "poem_nepali": "मेरो देश नेपाल सुन्दर छ,\nहिमाल, पहाड, तराई छ।\nयहाँ मिठा भाषा बोलिन्छ,\nसबै जातिका मान्छे बस्छन्।",
+        "poem_english": "My country Nepal is beautiful,\nIt has mountains, hills, and plains.\nSweet language is spoken here,\nPeople of all castes live here.",
+        "theme": "Patriotism and diversity",
+        "vocabulary": [
+          {"word": "देश", "meaning": "country"},
+          {"word": "हिमाल", "meaning": "mountain"},
+          {"word": "तराई", "meaning": "plains"},
+          {"word": "जाति", "meaning": "caste/ethnicity"}
+        ],
+        "cultural_notes": "Celebrates Nepal's geographical and cultural diversity",
+        "audio_notes": "Emphasize the rhythm and rhyme pattern typical of Nepali poetry"
+      },
+      {
+        "title": "आमाको माया",
+        "title_english": "Mother's Love",
+        "poem_nepali": "आमाको माया अतुलनीय छ,\nसधैं हाम्रो हेरचाह गर्छिन्।\nबिरामी हुँदा सेवा गर्छिन्,\nखुसी हुँदा खुसी हुन्छिन्।",
+        "poem_english": "Mother's love is incomparable,\nShe always takes care of us.\nWhen sick, she serves us,\nWhen happy, she becomes happy.",
+        "theme": "Maternal love and sacrifice",
+        "vocabulary": [
+          {"word": "माया", "meaning": "love"},
+          {"word": "अतुलनीय", "meaning": "incomparable"},
+          {"word": "हेरचाह", "meaning": "care"},
+          {"word": "बिरामी", "meaning": "sick"}
+        ],
+        "cultural_notes": "Reflects the deep respect for mothers in Nepali culture",
+        "audio_notes": "Gentle, loving tone appropriate for the theme"
+      }
+    ],
+    "audio_narration_scripts": {
+      "pace": "Slow and clear for beginners, normal speed for intermediate",
+      "pronunciation": "Standard Nepali pronunciation with clear enunciation",
+      "pauses": "Natural pauses at sentence breaks, longer pauses between paragraphs",
+      "emphasis": "Slight emphasis on new vocabulary words"
+    },
+    "cultural_context": {
+      "storytelling_tradition": "Oral storytelling is important in Nepali culture, often used to teach moral values",
+      "common_themes": "Honesty, hard work, respect for elders, unity in diversity",
+      "festivals_in_stories": "Many stories reference Dashain, Tihar, and other cultural celebrations",
+      "moral_lessons": "Stories typically end with clear moral teachings"
+    }
+  }
+}
