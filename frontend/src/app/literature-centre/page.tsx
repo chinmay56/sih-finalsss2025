@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import '../cultural-styles.css'
@@ -10,95 +10,20 @@ export default function LiteratureCentre() {
   const [language, setLanguage] = useState('en')
   const [theme, setTheme] = useState('light')
   const [uiTheme, setUiTheme] = useState('nepali-theme')
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [selectedManuscript, setSelectedManuscript] = useState<any>(null)
-  const [isPlaying, setIsPlaying] = useState(false)
-  const [currentSpeech, setCurrentSpeech] = useState<SpeechSynthesisUtterance | null>(null)
   const [showEbook, setShowEbook] = useState(false)
   const pathname = usePathname()
 
-  useEffect(() => {
-    return () => {
-      if (currentSpeech) {
-        speechSynthesis.cancel()
-      }
-    }
-  }, [])
 
-  const stopCurrentSpeech = () => {
-    if (currentSpeech) {
-      speechSynthesis.cancel()
-      setIsPlaying(false)
-      setCurrentSpeech(null)
-    }
-  }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleManuscriptClick = (manuscript: any) => {
     setSelectedManuscript(manuscript)
     setShowEbook(true)
   }
 
-  const handleAudioPlay = (manuscript: any) => {
-    // Stop any current speech
-    stopCurrentSpeech()
-    
-    // Get unique content and voice settings for each manuscript
-    const speechContent = getManuscriptContent(manuscript)
-    const voiceSettings = getVoiceSettings(manuscript)
-    
-    if ('speechSynthesis' in window) {
-      const utterance = new SpeechSynthesisUtterance(speechContent)
-      
-      // Apply voice settings
-      utterance.rate = voiceSettings.rate
-      utterance.pitch = voiceSettings.pitch
-      utterance.volume = voiceSettings.volume
-      
-      // Try to set a specific voice if available
-      const voices = speechSynthesis.getVoices()
-      let preferredVoice = voices.find(voice => 
-        voice.lang === voiceSettings.lang
-      )
-      
-      // Fallback to similar language codes
-      if (!preferredVoice) {
-        preferredVoice = voices.find(voice => 
-          voice.lang.startsWith(voiceSettings.lang.split('-')[0])
-        )
-      }
-      
-      // Final fallback to Indian English for Sanskrit/Hindi content
-      if (!preferredVoice && ['hi-IN', 'ne-NP'].includes(voiceSettings.lang)) {
-        preferredVoice = voices.find(voice => 
-          voice.lang === 'en-IN' || voice.name.toLowerCase().includes('indian')
-        )
-      }
-      
-      // Final fallback to British English for Sinhala content
-      if (!preferredVoice && voiceSettings.lang === 'si-LK') {
-        preferredVoice = voices.find(voice => 
-          voice.lang === 'en-GB' || voice.name.toLowerCase().includes('british')
-        )
-      }
-      
-      if (preferredVoice) {
-        utterance.voice = preferredVoice
-      }
-      
-      utterance.onstart = () => setIsPlaying(true)
-      utterance.onend = () => {
-        setIsPlaying(false)
-        setCurrentSpeech(null)
-      }
-      utterance.onerror = () => {
-        setIsPlaying(false)
-        setCurrentSpeech(null)
-      }
-      
-      setCurrentSpeech(utterance)
-      speechSynthesis.speak(utterance)
-    }
-  }
-
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const getEbookContent = (manuscript: any) => {
     const contents = {
       'रामायण': {
@@ -140,36 +65,8 @@ export default function LiteratureCentre() {
     }
     return contents[manuscript.title as keyof typeof contents] || { downloadUrl: '#', description: 'PDF download and extension translation available.' }
   }
-  
-  const getManuscriptContent = (manuscript: any) => {
-    const contents = {
-      'रामायण': 'Ramayana - The epic tale of Lord Rama. Ra-ma-ya-na, the story of Prince Rama from Ayodhya. A timeless saga of dharma, devotion, and righteousness that has guided humanity for millennia.',
-      'महाभारत': 'Mahabharata - The great epic of the Bharata dynasty. Ma-ha-bha-ra-ta, the eternal conflict between dharma and adharma. An epic war between good and evil, teaching us about duty and moral choices.',
-      'भगवद्गीता': 'Bhagavad Gita - The divine song of Lord Krishna. Bha-ga-vad Gee-ta, Shree Krishna ka divya upadesha. Timeless wisdom about life, duty, and spiritual enlightenment spoken on the battlefield of Kurukshetra.',
-      'मुना मदन': 'Muna Madan - A touching tale of love and sacrifice by Laxmi Prasad Devkota. Mu-na Ma-dan, prem ra tyag ko amar katha. The immortal story of Muna and Madan that captures the essence of Nepali culture and values.',
-      'शिरीषको फूल': 'Shirish ko Phool - Beautiful essays on life and nature. Shi-rish ko Phool, jeevan ra prakriti ka madhur nibandha haru. Reflective writings that connect us with the beauty of existence and human emotions.',
-      'කුමරිහිමි': 'Kumarihimi - A legendary princess tale from ancient Sri Lanka. Ku-ma-ri-hi-mi, purana Shree Lanka-we raja-kumari-yage katha-wa. A story of courage, wisdom, and cultural heritage from the pearl of the Indian Ocean.',
-      'සිරි සංගරාව': 'Siri Sangarawa - Classical Sinhala poetry of great beauty. Si-ri San-ga-ra-wa, sundara Sinhala kavya sampradaya. Ancient verses that celebrate the richness of Sinhala literary tradition and spiritual depth.',
-      'गिरिश कर्णको गीत': 'Girish Karna ko Geet - Modern Nepali songs with deep cultural meaning. Gi-rish Kar-na ko Geet, adhunik Nepali sangeet ko sundar parampara. Contemporary melodies that reflect the evolving spirit of Nepal.',
-      'සකුන්තලා': 'Sakuntala - The timeless drama by Kalidasa adapted in Sinhala. Sa-kun-ta-la, Kalidasa-ge sada-kalik natya-ya. A beautiful adaptation of the Sanskrit masterpiece showcasing eternal love and divine intervention.'
-    }
-    return contents[manuscript.title as keyof typeof contents] || `${manuscript.title} - ${manuscript.description}`
-  }
-  
-  const getVoiceSettings = (manuscript: any) => {
-    const settings = {
-      'रामायण': { rate: 0.8, pitch: 1.0, volume: 1, lang: 'hi-IN', voiceName: 'Hindi' },
-      'महाभारत': { rate: 0.7, pitch: 0.9, volume: 1, lang: 'hi-IN', voiceName: 'Hindi' },
-      'भगवद्गीता': { rate: 0.6, pitch: 1.1, volume: 1, lang: 'hi-IN', voiceName: 'Hindi' },
-      'मुना मदन': { rate: 0.8, pitch: 1.0, volume: 1, lang: 'ne-NP', voiceName: 'Nepali' },
-      'शिरीषको फूल': { rate: 0.7, pitch: 1.1, volume: 1, lang: 'ne-NP', voiceName: 'Nepali' },
-      'කුමරිහිමි': { rate: 0.8, pitch: 1.0, volume: 1, lang: 'si-LK', voiceName: 'Sinhala' },
-      'සිරි සංගරාව': { rate: 0.7, pitch: 1.2, volume: 1, lang: 'si-LK', voiceName: 'Sinhala' },
-      'गिरिश कर्णको गीत': { rate: 0.9, pitch: 0.9, volume: 1, lang: 'ne-NP', voiceName: 'Nepali' },
-      'සකුන්තලා': { rate: 0.8, pitch: 1.1, volume: 1, lang: 'si-LK', voiceName: 'Sinhala' }
-    }
-    return settings[manuscript.title as keyof typeof settings] || { rate: 1, pitch: 1, volume: 1, lang: 'en-IN', voiceName: 'Indian English' }
-  }
+
+
 
   const translations = {
     en: { title: 'संस्कृति', subtitle: 'Multilingual Cultural Translation Platform', offlineTranslator: 'Text Translator', learningModules: 'Learning Modules', literatureCentre: 'Literature Centre' },
@@ -252,7 +149,7 @@ export default function LiteratureCentre() {
               </div>
               <div className="library-ornament">📜</div>
             </div>
-            
+
             {!showEbook ? (
               <div className="manuscript-collection">
                 {manuscripts.map((manuscript, index) => (
@@ -274,13 +171,13 @@ export default function LiteratureCentre() {
                   <button onClick={() => setShowEbook(false)} className="back-btn">← Back to Library</button>
                   <h2>{selectedManuscript?.title}</h2>
                 </div>
-                
+
                 {selectedManuscript?.title === 'मुना मदन' && (
                   <div className="preview-section">
                     <h3>📖 Preview - Opening Lines</h3>
                     <div className="nepali-text">
-                      <p>"मान्छे त्यो हो जो मान्छेका लागि मर्छ"</p>
-                      <p>"Man is one who dies for mankind"</p>
+                      <p>&quot;मान्छे त्यो हो जो मान्छेका लागि मर्छ&quot;</p>
+                      <p>&quot;Man is one who dies for mankind&quot;</p>
                     </div>
                     <div className="story-excerpt">
                       <h4>Story Summary:</h4>
@@ -288,55 +185,55 @@ export default function LiteratureCentre() {
                     </div>
                   </div>
                 )}
-                
+
                 {selectedManuscript?.title === 'रामायण' && (
                   <div className="preview-section">
                     <h3>📖 Preview - Bala Kanda Opening</h3>
                     <div className="nepali-text">
-                      <p>"तपःस्वाध्यायशीलं तपस्वी वाग्विदां वरम्"</p>
-                      <p>"Devoted to austerity and study, the best among those who know speech"</p>
+                      <p>&quot;तपःस्वाध्यायशीलं तपस्वी वाग्विदां वरम्&quot;</p>
+                      <p>&quot;Devoted to austerity and study, the best among those who know speech&quot;</p>
                     </div>
                     <div className="story-excerpt">
                       <h4>Epic Summary:</h4>
-                      <p>The Ramayana is the ancient Sanskrit epic of Prince Rama's journey, his exile, Sita's abduction by Ravana, and the great war in Lanka. This version contains both Sanskrit verses and Hindi translation by Pandit D.P. Sharma.</p>
+                      <p>The Ramayana is the ancient Sanskrit epic of Prince Rama&apos;s journey, his exile, Sita&apos;s abduction by Ravana, and the great war in Lanka. This version contains both Sanskrit verses and Hindi translation by Pandit D.P. Sharma.</p>
                     </div>
                   </div>
                 )}
-                
+
                 {selectedManuscript?.title === 'महाभारत' && (
                   <div className="preview-section">
                     <h3>📖 Preview - Adi Parva Opening</h3>
                     <div className="nepali-text">
-                      <p>"नारायणं नमस्कृत्य नरं चैव नरोत्तमम्"</p>
-                      <p>"Having bowed to Narayana, and to Nara, the best of men"</p>
+                      <p>&quot;नारायणं नमस्कृत्य नरं चैव नरोत्तमम्&quot;</p>
+                      <p>&quot;Having bowed to Narayana, and to Nara, the best of men&quot;</p>
                     </div>
                     <div className="story-excerpt">
                       <h4>Epic Summary:</h4>
-                      <p>The Mahabharata is the world's longest epic poem, chronicling the great war between the Pandavas and Kauravas. This Gita Press edition contains the complete Sanskrit text with Hindi translation across multiple volumes.</p>
+                      <p>The Mahabharata is the world&apos;s longest epic poem, chronicling the great war between the Pandavas and Kauravas. This Gita Press edition contains the complete Sanskrit text with Hindi translation across multiple volumes.</p>
                     </div>
                   </div>
                 )}
-                
+
                 {selectedManuscript?.title === 'भगवद्गीता' && (
                   <div className="preview-section">
                     <h3>📖 Preview - Chapter 2, Verse 47</h3>
                     <div className="nepali-text">
-                      <p>"कर्मण्येवाधिकारस्ते मा फलेषु कदाचन"</p>
-                      <p>"You have the right to perform action, but never to the fruits of action"</p>
+                      <p>&quot;कर्मण्येवाधिकारस्ते मा फलेषु कदाचन&quot;</p>
+                      <p>&quot;You have the right to perform action, but never to the fruits of action&quot;</p>
                     </div>
                     <div className="story-excerpt">
                       <h4>Sacred Text Summary:</h4>
-                      <p>The Bhagavad Gita is Krishna's divine discourse to Arjuna on the battlefield of Kurukshetra. This Sanskrit Academy edition contains the original 700 verses with authentic Sanskrit text and scholarly commentary.</p>
+                      <p>The Bhagavad Gita is Krishna&apos;s divine discourse to Arjuna on the battlefield of Kurukshetra. This Sanskrit Academy edition contains the original 700 verses with authentic Sanskrit text and scholarly commentary.</p>
                     </div>
                   </div>
                 )}
-                
+
                 {selectedManuscript?.title === 'शिरीषको फूल' && (
                   <div className="preview-section">
                     <h3>📖 Preview - Essay Collection</h3>
                     <div className="nepali-text">
-                      <p>"जीवनमा कति रङ्गहरू छन्, कति माया छ"</p>
-                      <p>"How many colors are there in life, how much love there is"</p>
+                      <p>&quot;जीवनमा कति रङ्गहरू छन्, कति माया छ&quot;</p>
+                      <p>&quot;How many colors are there in life, how much love there is&quot;</p>
                     </div>
                     <div className="story-excerpt">
                       <h4>Essay Collection Summary:</h4>
@@ -344,13 +241,13 @@ export default function LiteratureCentre() {
                     </div>
                   </div>
                 )}
-                
+
                 {selectedManuscript?.title === 'සිරි සංගරාව' && (
                   <div className="preview-section">
                     <h3>📖 Preview - Classical Sinhala Poetry</h3>
                     <div className="nepali-text">
-                      <p>"සිරි සංගරාව සුන්දර කාව්ය"</p>
-                      <p>"Beautiful Siri Sangarawa poetry"</p>
+                      <p>&quot;සිරි සංගරාව සුන්දර කාව්ය&quot;</p>
+                      <p>&quot;Beautiful Siri Sangarawa poetry&quot;</p>
                     </div>
                     <div className="story-excerpt">
                       <h4>Poetry Collection Summary:</h4>
@@ -358,13 +255,13 @@ export default function LiteratureCentre() {
                     </div>
                   </div>
                 )}
-                
+
                 {selectedManuscript?.title === 'गिरिश कर्णको गीत' && (
                   <div className="preview-section">
                     <h3>📖 Preview - Nepali Folk Songs</h3>
                     <div className="nepali-text">
-                      <p>"बियाह सँ द्विरागमन धरिक गीत"</p>
-                      <p>"Wedding and ceremonial folk songs"</p>
+                      <p>&quot;बियाह सँ द्विरागमन धरिक गीत&quot;</p>
+                      <p>&quot;Wedding and ceremonial folk songs&quot;</p>
                     </div>
                     <div className="story-excerpt">
                       <h4>Folk Song Collection Summary:</h4>
@@ -372,13 +269,13 @@ export default function LiteratureCentre() {
                     </div>
                   </div>
                 )}
-                
+
                 {selectedManuscript?.title === 'කුමරිහිමි' && (
                   <div className="preview-section">
                     <h3>📖 Preview - Sinhala Legend</h3>
                     <div className="nepali-text">
-                      <p>"පදිනි චරිත්ර චොපාය"</p>
-                      <p>"Padhini Charitra - Historical Tales"</p>
+                      <p>&quot;පදිනි චරිත්ර චොපාය&quot;</p>
+                      <p>&quot;Padhini Charitra - Historical Tales&quot;</p>
                     </div>
                     <div className="story-excerpt">
                       <h4>Legend Collection Summary:</h4>
@@ -386,13 +283,13 @@ export default function LiteratureCentre() {
                     </div>
                   </div>
                 )}
-                
+
                 {selectedManuscript?.title === 'සකුන්තලා' && (
                   <div className="preview-section">
                     <h3>📖 Preview - Classical Drama</h3>
                     <div className="nepali-text">
-                      <p>"සකුන්තලා - කාලිදාසගේ නාට්යය"</p>
-                      <p>"Sakuntala - Kalidasa's Drama"</p>
+                      <p>&quot;සකුන්තලා - කාලිදාසගේ නාට්යය&quot;</p>
+                      <p>&quot;Sakuntala - Kalidasa&apos;s Drama&quot;</p>
                     </div>
                     <div className="story-excerpt">
                       <h4>Classical Drama Summary:</h4>
@@ -400,7 +297,7 @@ export default function LiteratureCentre() {
                     </div>
                   </div>
                 )}
-                
+
                 <div className="download-section">
                   <div className="download-card">
                     <h3>💾 Download E-book</h3>
@@ -516,7 +413,7 @@ export default function LiteratureCentre() {
           color: #666;
         }
       `}</style>
-      
+
       <footer className="cultural-footer">
         <div className="footer-pattern"></div>
         <div className="footer-content">

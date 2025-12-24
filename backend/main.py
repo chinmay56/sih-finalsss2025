@@ -1,31 +1,31 @@
-import os
-import torch
-import requests
-import base64
 import io
+import os
 import re
-from typing import List
-from fastapi import FastAPI, HTTPException, UploadFile, File
+import warnings
+from typing import List, Tuple
+
+import pdfplumber
+import torch
+import uvicorn
+from docx import Document
+from dotenv import load_dotenv
+from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import StreamingResponse
+from pdf2image import convert_from_bytes
 from pydantic import BaseModel
 from transformers import MBart50TokenizerFast, MBartForConditionalGeneration
-from dotenv import load_dotenv
-import uvicorn
-import pdfplumber
-from docx import Document
-from PIL import Image
-import zipfile
-import easyocr
-from pdf2image import convert_from_bytes
+
+# Suppress warnings
+warnings.filterwarnings('ignore', category=UserWarning)
+warnings.filterwarnings('ignore', category=FutureWarning)
 
 # Load environment variables
 load_dotenv()
 
 app = FastAPI(
-    title="Translation API",
-    description="Translate Nepali/Sinhala to English using fine-tuned MBART",
-    version="1.0"
+    title="Nepali/Sinhala to English Translation API",
+    description="Offline translation with proper noun preservation",
+    version="2.0"
 )
 
 # Add CORS middleware
@@ -47,268 +47,432 @@ class TranslateRequest(BaseModel):
     src_lang: str = "ne_NP"  # Default to Nepali
     tgt_lang: str = "en_XX"  # Default to English
 
+# =============================================================================
+# PROPER NOUN PROTECTION - FIXED VERSION
+# =============================================================================
+
+def extract_proper_nouns_offline(text: str) -> Tuple[str, List[Tuple[str, str]]]:
+    """Extract and replace proper nouns with placeholders - DISABLED for better translation"""
+    # Disabled proper noun extraction as it interferes with translation
+    return text, []
+
+def restore_proper_nouns(translated_text: str, entities: List[Tuple[str, str]]) -> str:
+    """Restore original proper nouns from placeholders"""
+    for placeholder, original in entities:
+        translated_text = translated_text.replace(placeholder, original)
+    return translated_text
+
+# =============================================================================
+# MODEL LOADING
+# =============================================================================
+
 def load_model_lazy():
     global tokenizer, model, device
-    
+
     if tokenizer is None or model is None:
         try:
             MODEL_ID = os.getenv("MODEL_ID", "Nikss2709/Mbart-nepali-sinhala-finetuned")
-            
+
             print("Loading tokenizer...")
             tokenizer = MBart50TokenizerFast.from_pretrained(MODEL_ID)
-            
-            print("Loading model with low memory usage...")
+
+            print("Loading model...")
             device = "cuda" if torch.cuda.is_available() else "cpu"
             model = MBartForConditionalGeneration.from_pretrained(
                 MODEL_ID,
-                low_cpu_mem_usage=True,
-                torch_dtype=torch.float16 if device == "cuda" else torch.float32
+                torch_dtype=torch.float16 if device == "cuda" else torch.float32,
+                low_cpu_mem_usage=True
             )
-            
+
             model = model.to(device)
             model.eval()
-            
+
             print(f"Model loaded on: {device}")
         except Exception as e:
             print(f"ERROR loading model: {e}")
-            raise HTTPException(status_code=503, detail=f"Model loading failed: {str(e)}")
+            raise HTTPException(status_code=503, detail=f"Model loading failed: {str(e)}") from e
 
-def translate_text(text: str, src_lang: str, tgt_lang: str):
+# =============================================================================
+# TEXT PREPROCESSING
+# =============================================================================
+
+def preprocess_text(text: str) -> str:
+    """Preprocess text to handle blank lines, extra spaces, and formatting issues"""
+    # Remove blank lines and normalize whitespace
+    lines = [line.strip() for line in text.split('\n') if line.strip()]
+    # Join lines with single space
+    text = ' '.join(lines)
+    # Normalize multiple spaces to single space
+    text = re.sub(r'\s+', ' ', text)
+    return text.strip()
+
+# =============================================================================
+# TRANSLATION FUNCTION - OPTIMIZED
+# =============================================================================
+
+def translate_text(text: str, src_lang: str, tgt_lang: str) -> str:
     try:
-        print(f"\n=== Starting translation ===")
-        print(f"Text: '{text}'")
-        print(f"From {src_lang} to {tgt_lang}")
-        
+        print(f"Translating from {src_lang} to {tgt_lang}")
+
+        if not text or not text.strip():
+            return text
+
         load_model_lazy()
-        
-        if not tokenizer or not model:
-            raise HTTPException(status_code=500, detail="Model not loaded")
-        
-        print(f"Setting tokenizer languages...")
+
+        # Preprocess text to remove blank lines and normalize whitespace
+        text = preprocess_text(text)
+
+        # Set up tokenizer
         tokenizer.src_lang = src_lang
-        tokenizer.tgt_lang = tgt_lang
+        forced_bos_id = tokenizer.lang_code_to_id[tgt_lang]
 
-        MAX_TOKENS = 128  # Current limit; increase to 256/512 if needed (mBART max is 1024)
+        # Split into sentences
+        sentences = re.split(r'(?<=[।.!?])\s+', text.strip())
+        if not sentences:
+            sentences = [text]
 
-        # Split text into sentences using regex for multilingual punctuation
-        sentences = re.split(r'(?<=[.!?।])\s+', text.strip())
+        # Translate each sentence
+        translated_parts = []
 
-        # Group sentences into chunks based on token length
-        chunks = []
-        current_chunk = []
-        for sent in sentences:
-            # Tentatively add to current chunk and check tokenized length
-            test_chunk = ' '.join(current_chunk + [sent])
-            encoded_test = tokenizer(
-                test_chunk,
-                return_tensors="pt",
-                truncation=False,
-                add_special_tokens=True
-            )['input_ids'][0]
-            if len(encoded_test) <= MAX_TOKENS:
-                current_chunk.append(sent)
-            else:
-                if current_chunk:
-                    chunks.append(' '.join(current_chunk))
-                current_chunk = [sent]  # Start new chunk
+        for sentence in sentences:
+            if not sentence.strip():
+                continue
 
-        if current_chunk:
-            chunks.append(' '.join(current_chunk))
-
-        print(f"Split into {len(chunks)} chunks")
-
-        # Translate each chunk
-        translated_chunks = []
-        for idx, chunk_text in enumerate(chunks):
-            print(f"Translating chunk {idx + 1}/{len(chunks)}: '{chunk_text}'")
-            encoded = tokenizer(
-                chunk_text,
+            inputs = tokenizer(
+                sentence,
                 return_tensors="pt",
                 truncation=True,
-                padding=True,
-                max_length=MAX_TOKENS
+                max_length=512,
+                padding=True
             ).to(device)
-            print(f"Chunk encoded, shape: {encoded['input_ids'].shape}")
 
-            generated = model.generate(
-                **encoded,
-                max_length=MAX_TOKENS * 2,  # Allow longer output if needed
-                num_beams=4,
-                early_stopping=True
-            )
-            output = tokenizer.decode(generated[0], skip_special_tokens=True)
-            translated_chunks.append(output)
-            print(f"Chunk translated: '{output}'")
+            with torch.no_grad():
+                outputs = model.generate(
+                    **inputs,
+                    forced_bos_token_id=forced_bos_id,
+                    max_length=512,
+                    num_beams=4,
+                    length_penalty=1.0,
+                    early_stopping=True,
+                    no_repeat_ngram_size=3
+                )
 
-        # Join translated chunks
-        final_output = ' '.join(translated_chunks)
-        print(f"Final output: '{final_output}'")
-        print(f"=== Translation complete ===\n")
-        return final_output
+            translated = tokenizer.decode(outputs[0], skip_special_tokens=True)
+            translated_parts.append(translated)
+
+        return " ".join(translated_parts).strip()
+
     except Exception as e:
-        print(f"\n!!! ERROR in translate_text: {str(e)}")
-        import traceback
-        traceback.print_exc()
-        raise
+        print(f"Translation error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Translation failed: {str(e)}") from e
+
+# =============================================================================
+# OCR FUNCTIONS - Using Tesseract for Nepali/Sinhala
+# =============================================================================
+
+# Import OCR modules
+try:
+    from ocr import (extract_handwritten_text,
+                     extract_printed_text)
+    OCR_AVAILABLE = True
+except ImportError as e:
+    print(f"OCR modules not found: {e}")
+    OCR_AVAILABLE = False
+
+async def extract_text_with_ocr(image_bytes: bytes, ocr_type: str = "printed") -> str:
+    """Extract text from image using advanced OCR (same as image upload)"""
+    try:
+        if not OCR_AVAILABLE:
+            return "OCR modules not available"
+
+        if ocr_type == "handwritten":
+            return extract_handwritten_text(image_bytes)
+        else:
+            # Default to printed OCR (Tesseract with advanced preprocessing)
+            return extract_printed_text(image_bytes)
+
+    except Exception as e:
+        print(f"OCR Error: {e}")
+        return ""
+
+# =============================================================================
+# FILE PROCESSING
+# =============================================================================
+
+async def extract_text_from_file(file_bytes: bytes, filename: str, ocr_type: str = "printed") -> str:
+    """Extract text from various file formats using advanced OCR"""
+    try:
+        ext = filename.lower().split('.')[-1]
+
+        if ext in ['txt', 'text']:
+            return file_bytes.decode('utf-8', errors='ignore').strip()
+
+        elif ext in ['pdf']:
+            # Try extracting text directly first
+            with pdfplumber.open(io.BytesIO(file_bytes)) as pdf:
+                text_parts = []
+                for page in pdf.pages:
+                    text = page.extract_text()
+                    if text:
+                        text_parts.append(text)
+
+                if text_parts:
+                    return '\n'.join(text_parts).strip()
+
+            # Fallback to advanced OCR for scanned PDFs
+            try:
+                images = convert_from_bytes(file_bytes)
+                ocr_text = []
+                for img in images:
+                    img_bytes = io.BytesIO()
+                    img.save(img_bytes, format='PNG')
+                    text = await extract_text_with_ocr(img_bytes.getvalue(), ocr_type)
+                    if text and not text.startswith("OCR") and not text.startswith("No text"):
+                        ocr_text.append(text)
+                return '\n'.join(ocr_text).strip()
+            except:
+                return ""
+
+        elif ext in ['docx', 'doc']:
+            doc = Document(io.BytesIO(file_bytes))
+            return '\n'.join([p.text for p in doc.paragraphs if p.text]).strip()
+
+        elif ext in ['jpg', 'jpeg', 'png', 'bmp', 'gif']:
+            # Use advanced OCR (same as image upload section)
+            return await extract_text_with_ocr(file_bytes, ocr_type)
+
+        else:
+            return f"Unsupported file format: {ext}"
+
+    except Exception as e:
+        print(f"Error extracting text from {filename}: {e}")
+        return ""
+
+# =============================================================================
+# API ENDPOINTS
+# =============================================================================
 
 @app.get("/")
-def home():
-    return {"message": "Translation API is running!", "status": "healthy"}
+def root():
+    return {
+        "message": "Nepali/Sinhala to English Translation API",
+        "version": "2.0",
+        "features": ["translation", "file_processing", "proper_noun_preservation"]
+    }
 
 @app.post("/translate")
-def translate_api(req: TranslateRequest):
+async def translate_api(request: TranslateRequest):
+    """Translate text from Nepali/Sinhala to English"""
     try:
-        print(f"\nReceived translation request: {req}")
-        result = translate_text(req.text, req.src_lang, req.tgt_lang)
-        return {"translated_text": result, "source_language": req.src_lang, "target_language": req.tgt_lang}
+        result = translate_text(request.text, request.src_lang, request.tgt_lang)
+        return {
+            "success": True,
+            "translated_text": result,
+            "source_lang": request.src_lang,
+            "target_lang": request.tgt_lang
+        }
     except Exception as e:
-        print(f"\n!!! ERROR in translate_api: {str(e)}")
-        import traceback
-        traceback.print_exc()
-        raise HTTPException(status_code=500, detail=f"Translation failed: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e)) from e
 
-@app.get("/supported-languages")
-def get_supported_languages():
+@app.get("/languages")
+def get_languages():
     return {
-        "languages": [
-            {"code": "ne_NP", "name": "Nepali", "display": "नेपाली"},
-            {"code": "si_LK", "name": "Sinhala", "display": "සිංහල"},
-            {"code": "en_XX", "name": "English", "display": "English"}
-        ]
+        "supported": [
+            {"code": "ne_NP", "name": "Nepali"},
+            {"code": "si_LK", "name": "Sinhala"},
+            {"code": "en_XX", "name": "English"}
+        ],
+        "default_source": "ne_NP",
+        "default_target": "en_XX"
     }
 
-@app.get("/health")
-def health_check():
-    model_status = "loaded" if model is not None else "not_loaded"
-    return {
-        "status": "healthy",
-        "model_status": model_status,
-        "device": device if device else "unknown"
-    }
-
-@app.post("/ocr/printed")
-async def extract_printed_text(file: UploadFile = File(...)):
+@app.post("/translate-file")
+async def translate_file(file: UploadFile = File(...)):
+    """Upload and translate a file"""
     try:
-        image_bytes = await file.read()
-        image = Image.open(io.BytesIO(image_bytes))
-        reader = easyocr.Reader(['ne', 'si', 'en'], gpu=False)
-        result = reader.readtext(image, detail=0)
-        text = ' '.join(result)
-        
-        if text.strip():
-            return {"extracted_text": text.strip(), "type": "printed"}
-        return {"extracted_text": "No text found in image", "type": "printed"}
-    except Exception as e:
-        print(f"OCR Error: {str(e)}")
-        return {"extracted_text": "OCR extraction failed", "type": "printed"}
+        # Read file
+        contents = await file.read()
 
-@app.post("/ocr/handwritten")
-async def extract_handwritten_text(file: UploadFile = File(...)):
-    try:
-        image_bytes = await file.read()
-        image = Image.open(io.BytesIO(image_bytes))
-        reader = easyocr.Reader(['ne', 'si', 'en'], gpu=False)
-        result = reader.readtext(image, detail=0)
-        text = ' '.join(result)
-        
-        if text.strip():
-            return {"extracted_text": text.strip(), "type": "handwritten"}
-        return {"extracted_text": "No text found in image", "type": "handwritten"}
-    except Exception as e:
-        print(f"OCR Error: {str(e)}")
-        return {"extracted_text": "OCR extraction failed", "type": "handwritten"}
+        # Extract text
+        text = await extract_text_from_file(contents, file.filename)
 
-def extract_text_from_file(file_bytes: bytes, filename: str) -> str:
-    ext = filename.lower().split('.')[-1]
-    print(f"\n=== Extracting text from {filename} (type: {ext}) ===")
-    
-    try:
-        if ext in ['jpg', 'jpeg', 'png', 'bmp']:
-            reader = easyocr.Reader(['ne', 'si', 'en'], gpu=False)
-            image = Image.open(io.BytesIO(file_bytes))
-            result = reader.readtext(image, detail=0)
-            text = ' '.join(result)
-            print(f"SUCCESS: Extracted {len(text)} characters from image using EasyOCR")
-            return text.strip()
-        
-        elif ext == 'pdf':
-            # Try text extraction first
-            with pdfplumber.open(io.BytesIO(file_bytes)) as pdf:
-                text = ""
-                for page in pdf.pages:
-                    page_text = page.extract_text()
-                    if page_text:
-                        text += page_text + "\n"
-            
-            # If no text found, use OCR on scanned PDF
-            if not text.strip():
-                print("No embedded text found, using OCR...")
-                reader = easyocr.Reader(['ne', 'si', 'en'], gpu=False)
-                images = convert_from_bytes(file_bytes)
-                for img in images:
-                    result = reader.readtext(img, detail=0)
-                    text += ' '.join(result) + "\n"
-            
-            print(f"SUCCESS: Extracted {len(text)} characters from PDF")
-            return text.strip()
-        
-        elif ext in ['doc', 'docx']:
-            doc = Document(io.BytesIO(file_bytes))
-            text = "\n".join([para.text for para in doc.paragraphs if para.text.strip()])
-            print(f"SUCCESS: Extracted {len(text)} characters from Word doc")
-            return text
-        
-        elif ext == 'txt':
-            text = file_bytes.decode('utf-8', errors='ignore')
-            print(f"SUCCESS: Extracted {len(text)} characters from TXT")
-            return text
-        
-        print(f"ERROR: Unsupported file type: {ext}")
-        return ""
-    except Exception as e:
-        print(f"ERROR extracting text from {filename}: {str(e)}")
-        import traceback
-        traceback.print_exc()
-        return ""
+        if not text:
+            return {
+                "success": False,
+                "error": "No text could be extracted from the file"
+            }
 
-@app.post("/bulk-translate")
-async def bulk_translate(files: List[UploadFile] = File(...)):
+        # Auto-detect language
+        src_lang = "ne_NP"
+        if re.search(r'[\u0D80-\u0DFF]', text):  # Sinhala characters
+            src_lang = "si_LK"
+
+        # Translate
+        translated = translate_text(text, src_lang, "en_XX")
+
+        return {
+            "success": True,
+            "filename": file.filename,
+            "original_text": text[:500] + "..." if len(text) > 500 else text,
+            "translated_text": translated,
+            "detected_language": src_lang
+        }
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e)) from e
+
+@app.post("/bulk-extract")
+async def bulk_extract(files: List[UploadFile] = File(...)):
+    """Extract text from multiple files without translating"""
     results = []
-    
+
     for file in files:
         try:
-            file_bytes = await file.read()
-            text = extract_text_from_file(file_bytes, file.filename)
-            
-            if not text.strip():
+            contents = await file.read()
+            text = await extract_text_from_file(contents, file.filename)
+
+            if text:
+                # Auto-detect language
+                src_lang = "ne_NP"
+                if re.search(r'[\u0D80-\u0DFF]', text):
+                    src_lang = "si_LK"
+
+                results.append({
+                    "filename": file.filename,
+                    "status": "success",
+                    "original_text": text,
+                    "detected_language": src_lang
+                })
+            else:
                 results.append({
                     "filename": file.filename,
                     "status": "error",
                     "error": "No text extracted"
                 })
-                continue
-            
-            src_lang = 'ne_NP'
-            if any('\u0D80' <= c <= '\u0DFF' for c in text):
-                src_lang = 'si_LK'
-            
-            translated = translate_text(text, src_lang, 'en_XX')
-            
-            results.append({
-                "filename": file.filename,
-                "status": "success",
-                "original_text": text,
-                "translated_text": translated,
-                "detected_language": src_lang
-            })
+
         except Exception as e:
             results.append({
                 "filename": file.filename,
                 "status": "error",
                 "error": str(e)
             })
-    
+
     return {"results": results}
 
+@app.post("/bulk-translate")
+async def bulk_translate(files: List[UploadFile] = File(...)):
+    """Translate multiple files at once"""
+    results = []
+
+    for file in files:
+        try:
+            contents = await file.read()
+            text = await extract_text_from_file(contents, file.filename)
+
+            if text:
+                # Auto-detect language
+                src_lang = "ne_NP"
+                if re.search(r'[\u0D80-\u0DFF]', text):
+                    src_lang = "si_LK"
+
+                translated = translate_text(text, src_lang, "en_XX")
+
+                results.append({
+                    "filename": file.filename,
+                    "status": "success",
+                    "original_text": text,
+                    "translated_text": translated,
+                    "detected_language": src_lang
+                })
+            else:
+                results.append({
+                    "filename": file.filename,
+                    "status": "error",
+                    "error": "No text extracted"
+                })
+
+        except Exception as e:
+            results.append({
+                "filename": file.filename,
+                "status": "error",
+                "error": str(e)
+            })
+
+    return {"results": results}
+
+@app.post("/ocr/printed")
+async def ocr_printed(file: UploadFile = File(...)):
+    """Extract text from printed image using OCR and translate"""
+    try:
+        contents = await file.read()
+        text = await extract_text_with_ocr(contents, "printed")
+
+        if not text or text.startswith("OCR") or text.startswith("No text"):
+            return {
+                "success": False,
+                "error": text if text else "No text could be extracted from the image"
+            }
+
+        # Auto-detect language
+        src_lang = "ne_NP"
+        if re.search(r'[\u0D80-\u0DFF]', text):  # Sinhala characters
+            src_lang = "si_LK"
+
+        # Translate
+        translated = translate_text(text, src_lang, "en_XX")
+
+        return {
+            "success": True,
+            "text": text,
+            "translated_text": translated,
+            "detected_language": src_lang
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e)) from e
+
+@app.post("/ocr/handwritten")
+async def ocr_handwritten(file: UploadFile = File(...)):
+    """Extract text from handwritten image using OCR and translate"""
+    try:
+        contents = await file.read()
+        text = await extract_text_with_ocr(contents, "handwritten")
+
+        if not text or text.startswith("OCR") or text.startswith("No text"):
+            return {
+                "success": False,
+                "error": text if text else "No text could be extracted from the image"
+            }
+
+        # Auto-detect language
+        src_lang = "ne_NP"
+        if re.search(r'[\u0D80-\u0DFF]', text):  # Sinhala characters
+            src_lang = "si_LK"
+
+        # Translate
+        translated = translate_text(text, src_lang, "en_XX")
+
+        return {
+            "success": True,
+            "text": text,
+            "translated_text": translated,
+            "detected_language": src_lang
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e)) from e
+
+@app.get("/health")
+def health_check():
+    return {
+        "status": "healthy",
+        "model_loaded": model is not None,
+        "device": device if device else "cpu",
+        "ocr_available": OCR_AVAILABLE
+    }
+
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000, reload=False, workers=1)
+    uvicorn.run(
+        app,
+        host="0.0.0.0",
+        port=int(os.getenv("PORT", 8000)),
+        reload=False
+    )

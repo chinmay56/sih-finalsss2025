@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import axios from 'axios'
 
 export default function TranslationHistory() {
@@ -23,7 +23,7 @@ export default function TranslationHistory() {
     <div className="mt-8 p-4 border rounded-lg">
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-lg font-semibold">Translation History</h3>
-        <button 
+        <button
           onClick={fetchHistory}
           disabled={loading}
           className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
@@ -31,9 +31,10 @@ export default function TranslationHistory() {
           {loading ? 'Loading...' : 'Load History'}
         </button>
       </div>
-      
+
       {history.length > 0 && (
         <div className="space-y-2 max-h-60 overflow-y-auto">
+          {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
           {history.map((item: any, index) => (
             <div key={index} className="p-3 bg-gray-50 rounded border-l-4 border-blue-400">
               <div className="text-sm text-gray-600 mb-1">

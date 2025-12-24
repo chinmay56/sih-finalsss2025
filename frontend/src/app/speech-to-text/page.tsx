@@ -13,6 +13,7 @@ export default function SpeechToText() {
   const [targetLang, setTargetLang] = useState('en_XX')
   const [isTranslating, setIsTranslating] = useState(false)
   const [error, setError] = useState('')
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const recognitionRef = useRef<any>(null)
 
   const startRecording = () => {
@@ -21,12 +22,14 @@ export default function SpeechToText() {
       return
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const SpeechRecognition = (window as any).webkitSpeechRecognition || (window as any).SpeechRecognition
     recognitionRef.current = new SpeechRecognition()
     recognitionRef.current.continuous = true
     recognitionRef.current.interimResults = true
     recognitionRef.current.lang = sourceLang
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     recognitionRef.current.onresult = (event: any) => {
       let finalTranscript = ''
       for (let i = event.resultIndex; i < event.results.length; i++) {
@@ -40,6 +43,7 @@ export default function SpeechToText() {
       }
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     recognitionRef.current.onerror = (event: any) => {
       console.error('Speech recognition error:', event.error)
       setIsRecording(false)
@@ -73,9 +77,11 @@ export default function SpeechToText() {
         tgt_lang: targetLang
       })
       setTranslatedText(response.data.translated_text)
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Translation error:', err)
-      setError(err.response?.data?.detail || 'Translation failed. Please try again.')
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const error = err as any
+      setError(error.response?.data?.detail || 'Translation failed. Please try again.')
     } finally {
       setIsTranslating(false)
     }
@@ -124,7 +130,7 @@ export default function SpeechToText() {
 
             <div style={{ marginBottom: '15px', display: 'flex', gap: '10px' }}>
               {!isRecording ? (
-                <button 
+                <button
                   onClick={startRecording}
                   className="transform-btn"
                   style={{ flex: 1 }}
@@ -132,7 +138,7 @@ export default function SpeechToText() {
                   🎤 START RECORDING
                 </button>
               ) : (
-                <button 
+                <button
                   onClick={stopRecording}
                   className="transform-btn"
                   style={{ flex: 1, background: '#dc3545' }}
@@ -141,7 +147,7 @@ export default function SpeechToText() {
                 </button>
               )}
               {transcribedText && (
-                <button 
+                <button
                   onClick={clearAll}
                   className="transform-btn"
                   style={{ background: '#6c757d' }}
@@ -156,7 +162,7 @@ export default function SpeechToText() {
                 🔴 Recording in progress...
               </div>
             )}
-            
+
             <textarea
               value={transcribedText}
               onChange={(e) => setTranscribedText(e.target.value)}
@@ -197,13 +203,13 @@ export default function SpeechToText() {
                 </select>
               </div>
             </div>
-            
+
             <textarea
               value={translatedText}
               readOnly
               placeholder="Translation will appear here..."
               className="sacred-textarea"
-              style={{ 
+              style={{
                 backgroundColor: '#f0f8ff',
                 border: '3px solid #daa520',
                 fontWeight: 'bold',

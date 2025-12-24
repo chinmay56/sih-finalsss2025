@@ -96,6 +96,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   };
 
   const t = (key: string): string => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return (translations[language] as any)[key] || key;
   };
 

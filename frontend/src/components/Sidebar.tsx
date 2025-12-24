@@ -4,15 +4,10 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useLanguage } from '../contexts/LanguageContext'
 
-interface SidebarProps {
-  activeTab: string
-  setActiveTab: (tab: string) => void
-}
-
-export default function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
+export default function Sidebar() {
   const pathname = usePathname()
   const { t } = useLanguage()
-  
+
   const menuItems = [
     { id: 'text-translator', label: t('nav.translate'), icon: '📝', href: '/text-translator' },
     { id: 'image-upload', label: t('nav.ocr'), icon: '🖼️', href: '/image-upload' },

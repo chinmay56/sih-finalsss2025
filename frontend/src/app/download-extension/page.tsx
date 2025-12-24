@@ -14,13 +14,13 @@ export default function DownloadExtension() {
           'Content-Type': 'application/json',
         },
       })
-      
+
       if (response.ok) {
         alert('Extension launched successfully! Look for the floating circular button on your screen.')
       } else {
         throw new Error('Failed to launch extension')
       }
-    } catch (error) {
+    } catch {
       alert('Failed to launch extension. Please try again.')
     }
   }
@@ -28,14 +28,14 @@ export default function DownloadExtension() {
   return (
     <Layout>
       <div className="max-w-4xl mx-auto text-center">
-        <h1 className="text-4xl font-bold mb-8" style={{color: '#8b4513'}}>Get Extension</h1>
-        
-        <div className="bg-white rounded-lg shadow-lg p-8 mb-8" style={{border: '2px solid #daa520'}}>
-          <h2 className="text-2xl font-semibold mb-4" style={{color: '#8b4513'}}>Floating Translator Extension</h2>
+        <h1 className="text-4xl font-bold mb-8" style={{ color: '#8b4513' }}>Get Extension</h1>
+
+        <div className="bg-white rounded-lg shadow-lg p-8 mb-8" style={{ border: '2px solid #daa520' }}>
+          <h2 className="text-2xl font-semibold mb-4" style={{ color: '#8b4513' }}>Floating Translator Extension</h2>
           <p className="text-lg text-gray-600 mb-6">A floating translator that stays on top of all applications for instant translation</p>
-          
+
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button 
+            <button
               onClick={launchExtension}
               className="px-8 py-3 rounded-lg font-bold text-white text-lg transition-all duration-300 hover:scale-105"
               style={{
@@ -45,9 +45,9 @@ export default function DownloadExtension() {
             >
               🚀 Launch Now
             </button>
-            
-            <a 
-              href="/extension.zip" 
+
+            <a
+              href="/extension.zip"
               download
               className="px-8 py-3 rounded-lg font-bold text-white text-lg transition-all duration-300 hover:scale-105 text-center"
               style={{
@@ -62,8 +62,8 @@ export default function DownloadExtension() {
         </div>
 
         <div className="grid md:grid-cols-2 gap-6">
-          <div className="bg-white rounded-lg shadow-md p-6" style={{border: '1px solid #daa520'}}>
-            <h3 className="text-xl font-semibold mb-3" style={{color: '#8b4513'}}>✨ Features</h3>
+          <div className="bg-white rounded-lg shadow-md p-6" style={{ border: '1px solid #daa520' }}>
+            <h3 className="text-xl font-semibold mb-3" style={{ color: '#8b4513' }}>✨ Features</h3>
             <ul className="text-left text-gray-600 space-y-2">
               <li>• Floating circular button</li>
               <li>• Always on top</li>
@@ -72,9 +72,9 @@ export default function DownloadExtension() {
               <li>• Cultural design theme</li>
             </ul>
           </div>
-          
-          <div className="bg-white rounded-lg shadow-md p-6" style={{border: '1px solid #daa520'}}>
-            <h3 className="text-xl font-semibold mb-3" style={{color: '#8b4513'}}>🔧 Setup Instructions</h3>
+
+          <div className="bg-white rounded-lg shadow-md p-6" style={{ border: '1px solid #daa520' }}>
+            <h3 className="text-xl font-semibold mb-3" style={{ color: '#8b4513' }}>🔧 Setup Instructions</h3>
             <div className="text-left text-gray-600 space-y-2">
               <p><strong>Windows:</strong></p>
               <code className="block bg-gray-100 p-2 rounded text-sm">python setup.py</code>

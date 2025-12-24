@@ -26,15 +26,43 @@ export default function OCRInterface() {
 
     try {
       const endpoint = ocrType === 'printed' ? '/ocr/printed' : '/ocr/handwritten'
+      console.log(`Calling OCR endpoint: ${endpoint}`)
+
       const response = await axios.post(`http://localhost:8000${endpoint}`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       })
-      
-      setExtractedText(response.data.extracted_text)
-    } catch (error) {
-      console.error('OCR failed:', error)
-      setExtractedText('Text extraction failed')
+
+      console.log('=== FULL RESPONSE ===')
+      console.log('Status:', response.status)
+      console.log('Data:', response.data)
+      console.log('Success field:', response.data.success, 'Type:', typeof response.data.success)
+      console.log('Text field:', response.data.text, 'Type:', typeof response.data.text)
+      console.log('Text length:', response.data.text?.length)
+      console.log('Error field:', response.data.error)
+      console.log('===================\n')
+
+      // Check if we have text
+      if (response.data.text && response.data.text.trim().length > 0) {
+        console.log('✅ TEXT FOUND - Setting extracted text')
+        setExtractedText(response.data.text)
+      } else if (response.data.error) {
+        console.log('❌ ERROR - Setting error message')
+        setExtractedText(`Error: ${response.data.error}`)
+      } else {
+        console.log('⚠️ NO TEXT OR ERROR - Setting default message')
+        setExtractedText('Error: No text could be extracted from the image')
+      }
+    } catch (error: unknown) {
+      console.error('=== EXCEPTION ===')
+      console.error('Error:', error)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const err = error as any
+      console.error('Response:', err.response)
+      console.error('Response data:', err.response?.data)
+      const errorMsg = err.response?.data?.detail || err.message || 'Text extraction failed'
+      setExtractedText(`Error: ${errorMsg}`)
     } finally {
+      console.log('Setting loading to false')
       setLoading(false)
     }
   }
@@ -42,7 +70,7 @@ export default function OCRInterface() {
   return (
     <div className="p-6 max-w-2xl mx-auto">
       <h2 className="text-2xl font-bold mb-6">Text Extraction</h2>
-      
+
       <div className="mb-4">
         <label className="block text-sm font-medium mb-2">Select OCR Type:</label>
         <div className="flex gap-4">

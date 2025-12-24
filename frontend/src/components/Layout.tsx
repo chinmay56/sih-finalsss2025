@@ -10,7 +10,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const { t, language, setLanguage } = useLanguage()
   const [theme, setTheme] = useState('light')
   const [uiTheme, setUiTheme] = useState('nepali-theme')
-  
+
   return (
     <div className={`cultural-app ${theme} ${uiTheme}`} suppressHydrationWarning>
       <header className="cultural-header">
@@ -39,10 +39,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
       <aside className="cultural-sidebar">
         <nav className="sidebar-nav">
-          <Sidebar activeTab="" setActiveTab={() => {}} />
+          <Sidebar />
         </nav>
       </aside>
-      
+
       <main className="cultural-main with-sidebar">
         <div className="content-container">
           {children}

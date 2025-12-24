@@ -28,37 +28,33 @@ export default function ImageUpload() {
     if (file) handleFileSelect(file)
   }
 
-  const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (file) handleFileSelect(file)
-  }
 
   const preprocessImage = (file: File): Promise<string> => {
     return new Promise((resolve) => {
       const canvas = document.createElement('canvas')
       const ctx = canvas.getContext('2d')!
       const img = new Image()
-      
+
       img.onload = () => {
         canvas.width = img.width * 2
         canvas.height = img.height * 2
-        
+
         ctx.imageSmoothingEnabled = false
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
-        
+
         const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height)
         const data = imageData.data
-        
+
         for (let i = 0; i < data.length; i += 4) {
           const avg = (data[i] + data[i + 1] + data[i + 2]) / 3
           const threshold = avg > 128 ? 255 : 0
           data[i] = data[i + 1] = data[i + 2] = threshold
         }
-        
+
         ctx.putImageData(imageData, 0, 0)
         resolve(canvas.toDataURL())
       }
-      
+
       img.src = URL.createObjectURL(file)
     })
   }
@@ -67,20 +63,26 @@ export default function ImageUpload() {
     setSelectedFile(file)
     setExtracting(true)
     setOcrProgress(0)
-    
+
     try {
       const formData = new FormData()
       formData.append('file', file)
-      
+
       const endpoint = type === 'printed' ? '/ocr/printed' : '/ocr/handwritten'
       const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
       const response = await fetch(`${API_BASE}${endpoint}`, {
         method: 'POST',
         body: formData
       })
-      
+
       const data = await response.json()
-      setExtractedText(data.extracted_text || 'No text detected')
+      console.log('OCR Response:', data)
+
+      if (data.success && data.text) {
+        setExtractedText(data.text)
+      } else {
+        setExtractedText(data.error || 'No text detected')
+      }
     } catch (error) {
       console.error('OCR extraction failed:', error)
       setExtractedText('OCR extraction failed. Please try again.')
@@ -95,7 +97,7 @@ export default function ImageUpload() {
     setOcrProgress(0)
     try {
       const processedImage = await preprocessImage(file)
-      
+
       const worker = await createWorker('nep+sin+eng', 1, {
         logger: m => {
           if (m.status === 'recognizing text') {
@@ -103,19 +105,19 @@ export default function ImageUpload() {
           }
         }
       })
-      
+
       await worker.setParameters({
         tessedit_pageseg_mode: PSM.SINGLE_BLOCK
       })
-      
+
       const { data: { text } } = await worker.recognize(processedImage)
       await worker.terminate()
-      
+
       const cleanedText = text
         .replace(/[^\u0900-\u097F\u0D80-\u0DFF\u0020-\u007E\s]/g, '')
         .replace(/\s+/g, ' ')
         .trim()
-      
+
       setExtractedText(cleanedText || 'No text detected. Please try a clearer image.')
     } catch (error) {
       console.error('OCR extraction failed:', error)
@@ -141,7 +143,7 @@ export default function ImageUpload() {
           tgt_lang: 'en_XX'
         })
       })
-      
+
       const data = await response.json()
       setTranslatedText(data.translated_text)
     } catch (error) {
@@ -168,7 +170,7 @@ export default function ImageUpload() {
         </div>
 
         {/* Upload Area */}
-        <div 
+        <div
           className={`sacred-upload ${dragActive ? 'drag-active' : ''}`}
           onDrop={handleDrop}
           onDragOver={(e) => { e.preventDefault(); setDragActive(true) }}
@@ -177,7 +179,7 @@ export default function ImageUpload() {
           <div className="upload-icon">🖼️</div>
           <div className="upload-text">Upload Image</div>
           <p className="upload-subtitle">Extract text from images - Nepali & Sinhala Support</p>
-          
+
           <input
             type="file"
             accept="image/*"
@@ -201,9 +203,9 @@ export default function ImageUpload() {
           }}>
             📷 Select Image
           </label>
-          
+
           <div className="upload-ornament"></div>
-          
+
           {selectedFile && (
             <div className="file-info">
               <span>📎 {selectedFile.name}</span>
@@ -222,7 +224,7 @@ export default function ImageUpload() {
               <span>🔊</span>
             </button>
           </div>
-          
+
           <textarea
             value={extractedText}
             onChange={(e) => setExtractedText(e.target.value)}
@@ -233,7 +235,7 @@ export default function ImageUpload() {
           {extracting && (
             <div className="ocr-progress">
               <div className="progress-bar">
-                <div className="progress-fill" style={{width: `${ocrProgress}%`}}></div>
+                <div className="progress-fill" style={{ width: `${ocrProgress}%` }}></div>
               </div>
               <span className="progress-text">{ocrProgress}% Complete</span>
             </div>
@@ -263,7 +265,7 @@ export default function ImageUpload() {
                 <span>🔊</span>
               </button>
             </div>
-            
+
             <textarea
               value={translatedText}
               readOnly
@@ -272,7 +274,7 @@ export default function ImageUpload() {
           </div>
         )}
       </div>
-      
+
       <BulkUpload />
     </Layout>
   )

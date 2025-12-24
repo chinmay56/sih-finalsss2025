@@ -9,8 +9,6 @@ services:
     restart: always
     expose:
       - "8000"
-    environment:
-      - GOOGLE_VISION_API_KEY=${GOOGLE_VISION_API_KEY}
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 30s
